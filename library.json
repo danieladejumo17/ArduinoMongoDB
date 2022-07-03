@@ -1,0 +1,21 @@
+{
+  "name": "ArduinoMongoDB",
+  "version": "1.0.0",
+  "description": "A Database system for Arduino",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/danieladejumo17/ArduinoMongoDB"
+  },
+  "authors": [
+    {
+      "name": "Daniel Adejumo",
+      "email": "adejumodaniel17@gmail.com",
+      "url": "https://github.com/danieladejumo17",
+      "maintainer": true
+    }
+  ],
+  "license": "BSD-3-Clause",
+  "homepage": "https://github.com/danieladejumo17/ArduinoMongoDB",
+  "frameworks": "*",
+  "platforms": "*"
+}
