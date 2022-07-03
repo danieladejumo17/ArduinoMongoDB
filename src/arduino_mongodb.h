@@ -7,7 +7,7 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 
-#include "LocalStorage.h"
+#include "littlefs_filesystem.h"
 
 #define ARDUINO_MONGODB_PATH "/AMDB"
 
@@ -21,12 +21,22 @@
 // TODO: Update schema field to include ObjectId and its ref
 
 struct ArduinoMongoSchemaField
+/* Defines properties of each field in a DB document:
+ * - `Type` of the data stored in the field
+ * - `Required`
+ * - `Default` value
+ * - `Min`, `Max` values for numeric fields
+ * - Validation function for custom validation
+ * */
 {
     enum Type: int {String, Int, Float, Double, Boolean, Object};
 
     Type type;
     bool required;
-    // use union to specify default type field
+    String defaultValue; //TODO: use union to specify default type field
+    int min;
+    int max;
+    bool (*validation)(const String&); 
 };
 using DBType = ArduinoMongoSchemaField::Type;
 

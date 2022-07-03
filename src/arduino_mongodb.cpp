@@ -1,5 +1,5 @@
-#include "ArduinoMongoDB.h"
-#include "HTTP_Utilities.h"
+#include "arduino_mongodb.h"
+#include "utilities.h"
 
 bool ArduinoMongoSchema::verifySchema(const String& doc) const
 {
