@@ -3,7 +3,7 @@
 // // --------------------------------------------
 
 // template<typename Callback>
-// void ArduinoMongoModel::find(bool(*match)(const ArduinoMongoModel&), Callback callback)
+// void ArduinoMongoModel::find_old(bool(*match)(const ArduinoMongoModel&), Callback callback)
 // {
 //     auto doc = createNew();
 //     bool found = false;
@@ -26,26 +26,26 @@
 // }
 
 // template<typename Callback>
-// void ArduinoMongoModel::find(const String &id, Callback callback)
+// void ArduinoMongoModel::find_old(const String &id, Callback callback)
 // {
 //     ArduinoMongoDB::findDocumentById(_collection, id, [&](bool err, const char* msg, const String& docString){
 //         callback(err?msg:"", err?createNew():createNew(docString));
 //     });
 // }
 
-// const ArduinoMongoModel& ArduinoMongoModel::createNew() const
+// const ArduinoMongoModel& ArduinoMongoModel::createNew_old() const
 // {
 //     return ArduinoMongoModel{_collection, _schema};
 // }
 
-// const ArduinoMongoModel& ArduinoMongoModel::createNew(const String &docString) const
+// const ArduinoMongoModel& ArduinoMongoModel::createNew_old(const String &docString) const
 // {
 //     ArduinoMongoModel newDoc = createNew();
 //     newDoc.set(docString);
 //     return newDoc;
 // }
 
-// bool ArduinoMongoModel::set(const String &docString)
+// bool ArduinoMongoModel::set_old(const String &docString)
 // {   
 //     // FIXME:
 //     // clear the buffer first???
@@ -60,7 +60,7 @@
 // }
 
 // template<typename Callback>
-// void ArduinoMongoModel::save(Callback callback)
+// void ArduinoMongoModel::save_old(Callback callback)
 // {
 //     // TODO: if verifySchema(doc) -> the one taking a doc argument
 //     // User can create _id field in schema and it will not be filled anymore here
@@ -73,7 +73,7 @@
 // }
 
 // template<typename Callback>
-// void ArduinoMongoModel::remove(Callback callback)
+// void ArduinoMongoModel::remove_old(Callback callback)
 // {
 //     if(_doc.containsKey("_id")){ // if the doc is saved
 //         ArduinoMongoDB::removeDocument(_collection, _doc["_id"], [&](bool err, const char* msg){

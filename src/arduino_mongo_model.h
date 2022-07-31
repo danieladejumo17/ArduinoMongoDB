@@ -14,6 +14,11 @@ private:
     const String _collection;
     const ArduinoMongoSchema &_schema;
     String _document;
+    
+    /**
+     * @returns the next _id in this collection
+     */ 
+    String nextID() const;
 
 public:
     ArduinoMongoModel(const String &collection, const ArduinoMongoSchema &schema,
@@ -33,7 +38,7 @@ public:
     /**
      * @brief Sets the document to the provided JSON string.
      * @param document JSON string of the document to create
-     * */
+     */
     void setDocument(const String &docString);
 
     /**
@@ -45,15 +50,15 @@ public:
 
     /**
      * @brief Saves this document to the database
-     * @return true if operation is successful, otherwise false
-     * */
+     * @returns true if operation is successful, otherwise false
+     */
     bool save();
 
     /**
      * @brief Saves this document to the database
-     * @param callback a callable function that takes 'doc' and 'err' parameters.
-     * 'doc' is a String and 'err' is a boolean
-     * */
+     * @param callback a callable function that takes `doc` and `err` parameters.
+     * `doc` is a String and `err` is a boolean
+     */
     template <typename Callback>
     void save(Callback callback);
 
@@ -63,34 +68,34 @@ public:
     /**
      * @brief Gets the string value of a key
      * @param key key to get from the document
-     * @return value of the key or empty string if key does not exist
-     * */
+     * @returns value of the key or empty string if key does not exist
+     */
     String get(const String &) const;
 
     /**
      * @brief Gets the string value of a key.
      * This is an alias of ArduinoMongoModel::get
-     * @return value of the key or empty string if key does not exist
-     * */
+     * @returns value of the key or empty string if key does not exist
+     */
     String operator[](const String &) const;
 
     /**
-     * @return the String representation of this document
-     * */
+     * @returns the String representation of this document
+     */
     operator String() const;
 
     /**
-     * @return the String representation of this document
-     * */
+     * @returns the String representation of this document
+     */
     String toString() const;
 
     /**
      * @brief Find a document by its ID
      * @param _id document's ID
-     * @param callback a callable function that takes 'doc' and 'err' parameters.
-     * 'doc' is a String of the document found, it's empty if document is not found.
-     * 'err' is a boolean, it's true if the operation fails
-     * */
+     * @param callback a callable function that takes `doc` and `err` parameters.
+     * `doc` is a String of the document found, it's empty if document is not found.
+     * `err` is a boolean, it's true if the operation fails
+     */
     template <typename Callback>
     void findByID(const String &_id, Callback callback);
 
@@ -99,10 +104,10 @@ public:
      * @param find_cb this function is called with a ArduinoMongoModel object of each document
      * in this collection. It should return true for a matching document. Only the first document
      * is reckoned with.
-     * @param callback a callable function that takes 'doc' and 'err' parameters.
-     * 'doc' is a String of the document found, it's empty if no match is found.
-     * 'err' is a boolean, it's true if the operation fails
-     * */
+     * @param callback a callable function that takes `doc` and `err` parameters.
+     * `doc` is a String of the document found, it's empty if no match is found.
+     * `err` is a boolean, it's true if the operation fails
+     */
     template <typename Callback>
     void find(bool (*find_cb)(const ArduinoMongoModel &), Callback callback);
 
@@ -111,10 +116,10 @@ public:
      * @param find_cb this function is called with a JSON String of each document in this
      * collection. It should return true for a matching document. Only the first document is
      * reckoned with.
-     * @param callback a callable function that takes 'doc' and 'err' parameters.
-     * 'doc' is a String of the document found, it's empty if no match is found.
-     * 'err' is a boolean, it's true if the operation fails
-     * */
+     * @param callback a callable function that takes `doc` and `err` parameters.
+     * `doc` is a String of the document found, it's empty if no match is found.
+     * `err` is a boolean, it's true if the operation fails
+     */
     template <typename Callback>
     void find(bool (*find_cb)(const String &), Callback callback);
 
@@ -123,16 +128,16 @@ public:
 
     /**
      * @brief deletes this document from the database
-     * @return true if operation is successful, otherwise false
-     * */
+     * @returns true if operation is successful, otherwise false
+     */
     bool remove();
 
     /**
      * @brief deletes this document from the database
-     * @param callback a callable function that takes 'doc' and 'err' parameters.
-     * 'doc' is a String of this document
-     * 'err' is a boolean, it's true if the operation fails
-     * */
+     * @param callback a callable function that takes `doc` and `err` parameters.
+     * `doc` is a String of this document
+     * `err` is a boolean, it's true if the operation fails
+     */
     template <typename Callback>
     void remove(Callback);
 };
