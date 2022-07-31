@@ -14,24 +14,31 @@ private:
     const String _collection;
     const ArduinoMongoSchema &_schema;
     String _document;
-    
+    bool (*_verify)(const ArduinoMongoModel &);
+
     /**
      * @returns the next _id in this collection
-     */ 
+     */
     String nextID() const;
 
 public:
     ArduinoMongoModel(const String &collection, const ArduinoMongoSchema &schema,
+                      bool (*verify)(const ArduinoMongoModel &), const String &document = String())
+        : _collection{collection}, _schema{schema}, _document{document}, _verify{verify}
+    {
+    }
+
+    ArduinoMongoModel(const String &collection, const ArduinoMongoSchema &schema,
                       const String &document = String())
-        : _collection{collection}, _schema{schema}, _document{document}
+        : _collection{collection}, _schema{schema}, _document{document}, _verify{nullptr}
     {
     }
 
     ArduinoMongoModel(const ArduinoMongoModel &model, const String &document = String())
-        : _collection{model._collection}, _schema{model._schema}, _document{document}
+        : _collection{model._collection}, _schema{model._schema}, _document{document},
+          _verify{model._verify}
     {
     }
-
 
     // -------------- CREATE & UPDATE OPERATIONS --------------
 
@@ -61,7 +68,6 @@ public:
      */
     template <typename Callback>
     void save(Callback callback);
-
 
     // -------------- READ OPERATIONS --------------
 
@@ -122,7 +128,6 @@ public:
      */
     template <typename Callback>
     void find(bool (*find_cb)(const String &), Callback callback);
-
 
     // -------------- DELETE OPERATION --------------
 
