@@ -1,65 +1,140 @@
-// // TODO: calculate _schemaBufferSize in Schema Object
-// // TODO: Populate fields in models with default values
-// // TODO: Add timestamp to schema
-// // TODO: Populate collection init file (.mdbc) properly - creation date,
-//         // last edit, docs count, and other collection metadata
-// // TODO: indexing the database collections by _id and other custom indices for fast lookup
+#ifndef ARDUINO_MNGO_MODEL_HEADER
+#define ARDUINO_MNGO_MODEL_HEADER
 
-// // TODO: Update schema field to include ObjectId and its ref
+#include <Arduino.h>
+#include <ArduinoJson.h>
+#include "schema.h"
+#include "arduino_mongodb.h"
+#include "arduino_utilities.h"
 
+// Programming Interface to the DB
+class ArduinoMongoModel
+{
+private:
+    const String _collection;
+    const ArduinoMongoSchema &_schema;
+    String _document;
 
-// #############################################
-// ARDUINO_MONGODB
-// TODO: confirm uuid length is not too long for filenames
-// FIXME: M,MS,DM,SDMSD,MD,SMDS,DMSDSMD,SMDS,DMSD,SMDSD
+public:
+    ArduinoMongoModel(const String &collection, const ArduinoMongoSchema &schema,
+                      const String &document = String())
+        : _collection{collection}, _schema{schema}, _document{document}
+    {
+    }
 
-// TODO: IDs generated in the ArduinoMomgoDB is only unique on the same machine and not across machines
-// TODO: Check the initialization of the collections and database before returning true on exists() methods
-// ARDUINO_MONGODB
-// #############################################
-
-
-
-
-// // Programming Interface to the DB
-// class ArduinoMongoModel{
-//     private:
-//         const String _collection;
-//         DynamicJsonBuffer _jsonBuffer;
-//         JsonObject &_doc;
-//         const ArduinoMongoSchema &_schema;
+    ArduinoMongoModel(const ArduinoMongoModel &model, const String &document = String())
+        : _collection{model._collection}, _schema{model._schema}, _document{document}
+    {
+    }
 
 
-//     public:
-//         ArduinoMongoModel(const String &collection, const ArduinoMongoSchema &schema)
-//             : _collection{collection}, _schema{schema}, _jsonBuffer{schema.bufferSize()}, _doc(_jsonBuffer.createObject())
-//         {}
+    // -------------- CREATE & UPDATE OPERATIONS --------------
 
-//         ArduinoMongoModel(const ArduinoMongoModel &model)
-//             :_collection{model._collection}, _schema{model._schema}, _jsonBuffer{model._schema.bufferSize()}, _doc(_jsonBuffer.createObject())
-//         {}
+    /**
+     * @brief Sets the document to the provided JSON string.
+     * @param document JSON string of the document to create
+     * */
+    void setDocument(const String &docString);
 
-//         template<typename Callback>
-//         void find(bool(*)(const ArduinoMongoModel&), Callback);
-//         template<typename Callback>
-//         void find(const String&, Callback);
+    /**
+     * @brief Sets the value of 'key' to the provided 'value'.
+     * @param key key to set
+     * @param value value to set the key to
+     */
+    void set(const String &key, const String &value);
 
-//         // void* operator new();
-//         // void operator= ();
+    /**
+     * @brief Saves this document to the database
+     * @return true if operation is successful, otherwise false
+     * */
+    bool save();
 
-//         const ArduinoMongoModel& createNew() const;
-//         const ArduinoMongoModel& createNew(const String&) const;
-//         ArduinoJson::Internals::JsonObjectSubscript<const String &> operator[](const String &key) {return _doc[key];}
-//         // operator[](key, type)
-
-//         bool set(const String&);
-
-//         template<typename Callback>
-//         void save(Callback);
-
-//         template<typename Callback>
-//         void remove(Callback);
-
+    /**
+     * @brief Saves this document to the database
+     * @param callback a callable function that takes 'doc' and 'err' parameters.
+     * 'doc' is a String and 'err' is a boolean
+     * */
+    template <typename Callback>
+    void save(Callback callback);
 
 
-// };
+    // -------------- READ OPERATIONS --------------
+
+    /**
+     * @brief Gets the string value of a key
+     * @param key key to get from the document
+     * @return value of the key or empty string if key does not exist
+     * */
+    String get(const String &) const;
+
+    /**
+     * @brief Gets the string value of a key.
+     * This is an alias of ArduinoMongoModel::get
+     * @return value of the key or empty string if key does not exist
+     * */
+    String operator[](const String &) const;
+
+    /**
+     * @return the String representation of this document
+     * */
+    operator String() const;
+
+    /**
+     * @return the String representation of this document
+     * */
+    String toString() const;
+
+    /**
+     * @brief Find a document by its ID
+     * @param _id document's ID
+     * @param callback a callable function that takes 'doc' and 'err' parameters.
+     * 'doc' is a String of the document found, it's empty if document is not found.
+     * 'err' is a boolean, it's true if the operation fails
+     * */
+    template <typename Callback>
+    void findByID(const String &_id, Callback callback);
+
+    /**
+     * @brief Find a document by a custom function.
+     * @param find_cb this function is called with a ArduinoMongoModel object of each document
+     * in this collection. It should return true for a matching document. Only the first document
+     * is reckoned with.
+     * @param callback a callable function that takes 'doc' and 'err' parameters.
+     * 'doc' is a String of the document found, it's empty if no match is found.
+     * 'err' is a boolean, it's true if the operation fails
+     * */
+    template <typename Callback>
+    void find(bool (*find_cb)(const ArduinoMongoModel &), Callback callback);
+
+    /**
+     * @brief Find a document by a custom function.
+     * @param find_cb this function is called with a JSON String of each document in this
+     * collection. It should return true for a matching document. Only the first document is
+     * reckoned with.
+     * @param callback a callable function that takes 'doc' and 'err' parameters.
+     * 'doc' is a String of the document found, it's empty if no match is found.
+     * 'err' is a boolean, it's true if the operation fails
+     * */
+    template <typename Callback>
+    void find(bool (*find_cb)(const String &), Callback callback);
+
+
+    // -------------- DELETE OPERATION --------------
+
+    /**
+     * @brief deletes this document from the database
+     * @return true if operation is successful, otherwise false
+     * */
+    bool remove();
+
+    /**
+     * @brief deletes this document from the database
+     * @param callback a callable function that takes 'doc' and 'err' parameters.
+     * 'doc' is a String of this document
+     * 'err' is a boolean, it's true if the operation fails
+     * */
+    template <typename Callback>
+    void remove(Callback);
+};
+
+#endif // ARDUINO_MNGO_MODEL_HEADER
