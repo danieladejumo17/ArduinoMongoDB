@@ -1,6 +1,93 @@
 // // --------------------------------------------
 // // ---------- ArduinoMongoModel ---------------
 // // --------------------------------------------
+#include "arduino_mongo_model.h"
+
+ArduinoMongoModel::ArduinoMongoModel(const String &collection, const ArduinoMongoSchema &schema,
+                                     bool (*verify)(const ArduinoMongoModel &),
+                                     const String &document = String())
+    : _collection{collection}, _schema{schema}, _document{document}, _verify{verify}
+{
+    // Initialize the collection if it doesn't exist
+    if (!ArduinoMongoDB::connected())
+    {
+        logerr("Failed to initialize collection: database is not connected");
+        return;
+    }
+
+    if (!ArduinoMongoDB::createCollection(_collection))
+    {
+        logerr("Failed to initialize collection: failed to create collection");
+        return;
+    }
+}
+
+void ArduinoMongoModel::setDocument(const String &docString)
+{
+    _document = docString;
+}
+
+void ArduinoMongoModel::set(const String &key, const String &value)
+{
+    deserializeJSON(_document, [&](JsonObject &json)
+                    {
+        json[key] = value;
+        _document = serializeJSON(json); });
+}
+
+bool ArduinoMongoModel::save()
+{
+    // don't save empty document
+    if (_document.length() == 0)
+    {
+        logerr("Failed to save document: document is empty");
+        return false;
+    }
+
+    // verify the document
+    if (_verify != nullptr && !_verify(*this))
+    {
+        logerr("Failed to save document: validation failed");
+        return false;
+    }
+
+    // verify the schema
+    if (!_schema.verifyDocument(_document))
+    {
+        logerr("Failed to save document: schema verification failed");
+        return false;
+    }
+
+    // save document with the ArduinoMongoDB interface
+    // get the document _id from the document or create one if it doesn't exist
+    String _id = get("_id");
+    if (_id.length() == 0)
+    {
+        _id = nextID();
+        set("_id", _id);
+    }
+
+    if (!ArduinoMongoDB::createDocument(_document, _collection, _id))
+    {
+        logerr("Failed to save document: failed to create/update document");
+        return false;
+    }
+
+    return true;
+}
+
+template <typename Callback>
+void ArduinoMongoModel::save(Callback callback)
+{
+    if (!save())
+    {
+        callback(String(), false);
+        return false;
+    }
+
+    callback(_document, true);
+    return true;
+}
 
 // template<typename Callback>
 // void ArduinoMongoModel::find_old(bool(*match)(const ArduinoMongoModel&), Callback callback)
@@ -46,7 +133,7 @@
 // }
 
 // bool ArduinoMongoModel::set_old(const String &docString)
-// {   
+// {
 //     // FIXME:
 //     // clear the buffer first???
 //     _jsonBuffer.clear();
@@ -81,4 +168,3 @@
 //         });
 //     }
 // }
-

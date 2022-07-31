@@ -23,20 +23,17 @@ private:
 
 public:
     ArduinoMongoModel(const String &collection, const ArduinoMongoSchema &schema,
-                      bool (*verify)(const ArduinoMongoModel &), const String &document = String())
-        : _collection{collection}, _schema{schema}, _document{document}, _verify{verify}
-    {
-    }
+                      bool (*verify)(const ArduinoMongoModel &),
+                      const String &document = String());
 
     ArduinoMongoModel(const String &collection, const ArduinoMongoSchema &schema,
                       const String &document = String())
-        : _collection{collection}, _schema{schema}, _document{document}, _verify{nullptr}
+        : ArduinoMongoModel{collection, schema, nullptr, document}
     {
     }
 
     ArduinoMongoModel(const ArduinoMongoModel &model, const String &document = String())
-        : _collection{model._collection}, _schema{model._schema}, _document{document},
-          _verify{model._verify}
+        : ArduinoMongoModel{model._collection, model._schema, model._verify, document}
     {
     }
 

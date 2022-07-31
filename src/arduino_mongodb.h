@@ -44,7 +44,7 @@ class ArduinoMongoDB{
         // ------------------ DOCUMENT OPERATIONS ------------------
         /**
          * createDocument(document, collection, ID)
-         * Creates a new document in the specified collection.
+         * Creates a new document in the specified collection. Equally used to update a document.
          * :param document: The document String to create.
          * :param collection: The collection to create the document in.
          * :param ID: The ID of the document.
@@ -70,6 +70,7 @@ class ArduinoMongoDB{
 
         /**
          * updateDocument(document, collection, ID)
+         * This is an alias for createDocument.
          * Updates the document with the specified ID in the specified collection. The document will be replaced with the new document.
          * :param collection: The collection to update the document in.
          * :param ID: The ID of the document to update.
